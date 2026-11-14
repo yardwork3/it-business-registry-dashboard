@@ -22,14 +22,25 @@ def connect(db_path: Path = LOCAL_DB) -> DataSource:
         return DataSource(con, "dashboard_monthly", "dashboard_retention", "Полные локальные агрегаты")
     if not DEMO_MONTHLY.exists() or not DEMO_RETENTION.exists():
         raise FileNotFoundError("Нет локальной DuckDB и демонстрационных Parquet. Запустите scripts/prepare_data.py.")
-    con = duckdb.connect()
+        con = duckdb.connect()
+
+    monthly_path = str(DEMO_MONTHLY).replace("'", "''")
+    retention_path = str(DEMO_RETENTION).replace("'", "''")
+
     con.execute(
-    f"CREATE VIEW dashboard_monthly AS SELECT * FROM read_parquet('{str(DEMO_MONTHLY).replace(chr(39), chr(39)*2)}')"
-)
-con.execute(
-    f"CREATE VIEW dashboard_retention AS SELECT * FROM read_parquet('{str(DEMO_RETENTION).replace(chr(39), chr(39)*2)}')"
-)
-return DataSource(con, "dashboard_monthly", "dashboard_retention", "Обезличенный демонстрационный набор")
+        f"CREATE VIEW dashboard_monthly AS SELECT * FROM read_parquet('{monthly_path}')"
+    )
+
+    con.execute(
+        f"CREATE VIEW dashboard_retention AS SELECT * FROM read_parquet('{retention_path}')"
+    )
+
+    return DataSource(
+        con,
+        "dashboard_monthly",
+        "dashboard_retention",
+        "Обезличенный демонстрационный набор"
+    )
 
 
 def rows(con: duckdb.DuckDBPyConnection, sql: str, params: list | None = None) -> list[dict]:
