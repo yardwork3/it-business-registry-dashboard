@@ -29,7 +29,7 @@ def connect(db_path: Path = LOCAL_DB) -> DataSource:
 con.execute(
     f"CREATE VIEW dashboard_retention AS SELECT * FROM read_parquet('{str(DEMO_RETENTION).replace(chr(39), chr(39)*2)}')"
 )
-    return DataSource(con, "dashboard_monthly", "dashboard_retention", "Обезличенный демонстрационный набор")
+return DataSource(con, "dashboard_monthly", "dashboard_retention", "Обезличенный демонстрационный набор")
 
 
 def rows(con: duckdb.DuckDBPyConnection, sql: str, params: list | None = None) -> list[dict]:
